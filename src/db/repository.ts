@@ -2,7 +2,7 @@
  * توابع تعامل با دیتابیس:
  * درج دسته‌ای داده‌ها و واکشی داده‌ها از TimescaleDB
  */
-import { prisma } from "./client.ts";
+import { prisma } from "./client.js";
 
 /**
  * مدل داده‌ای Telemetry مطابق با Prisma Schema
@@ -18,7 +18,6 @@ export interface TelemetryInput {
 
 /**
  * درج دسته‌ای (bulk insert) داده‌های telemetry
- * @param rows آرایه‌ای از رکوردهای داده‌ای
  */
 export async function insertTelemetryBatch(rows: TelemetryInput[]) {
   if (!rows.length) return { inserted: 0 };
@@ -40,9 +39,6 @@ export async function insertTelemetryBatch(rows: TelemetryInput[]) {
 
 /**
  * کوئری داده‌ها برای یک دستگاه در بازه زمانی مشخص
- * @param deviceId شناسه دستگاه
- * @param from شروع بازه
- * @param to پایان بازه
  */
 export async function getTelemetry(deviceId: string, from: Date, to: Date, limit = 100) {
   const data = await prisma.telemetry.findMany({

@@ -1,8 +1,4 @@
-/**
- * فایل اتصال به پایگاه داده با Prisma
- * این فایل فقط یک بار ساخته می‌شود و در کل پروژه استفاده می‌شود.
- */
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from "@prisma/client";
 
 export const prisma = new PrismaClient({
   log: ["query", "info", "warn", "error"],
