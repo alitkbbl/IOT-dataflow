@@ -7,6 +7,10 @@ import dotenv from "dotenv";
 import healthRoute from "./api/health.js";
 import metricsRoute from "./api/metrics.js";
 import queryRoute from "./api/query.js";
+import "./mqtt/index.ts";
+import analyticsRoute from "./api/analytics.js";
+
+
 
 dotenv.config();
 
@@ -17,6 +21,8 @@ app.use(express.json());
 app.use("/api", healthRoute);
 app.use("/api", metricsRoute);
 app.use("/api", queryRoute);
+app.use("/api", analyticsRoute);
+
 
 // راه‌اندازی سرور
 const PORT = Number(process.env.PORT ?? 3000);
