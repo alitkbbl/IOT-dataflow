@@ -1,0 +1,55 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb-ha:pg16
+    container_name: timescaledb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: iot_dataflow
+    volumes:
+      - timescale_data:/home/postgres/pgdata/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - iot-network
+
+  emqx:
+    image: emqx:5.8.6
+    container_name: emqx
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "18083:18083"
+    networks:
+      - iot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18083"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  iot-api:
+    build: .
+    container_name: iot-api
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      emqx:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    env_file: .env
+    networks:
+      - iot-network
+    restart: on-failure
+
+volumes:
+  timescale_data:
+
+networks:
+  iot-network:

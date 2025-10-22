@@ -4,13 +4,13 @@
   "type": "module",
   "description": "IoT Data Pipeline with Express, Prisma, and TimescaleDB",
   "main": "dist/server.js",
-  "scripts": {
+"scripts": {
     "dev": "tsx src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "migrate": "prisma migrate dev --name init",
-    "generate": "prisma generate",
-    "studio": "prisma studio"
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up",
+    "docker:down": "docker compose down -v"
   },
   "dependencies": {
     "@prisma/client": "^6.17.1",

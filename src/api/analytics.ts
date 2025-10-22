@@ -3,9 +3,6 @@ import { prisma } from "../db/client.js";
 
 const router = express.Router();
 
-/**
- * 📊 نوع داده‌ی telemetry در payload
- */
 interface TelemetryPayload {
   temperature?: number;
   humidity?: number;
@@ -13,13 +10,12 @@ interface TelemetryPayload {
 }
 
 /**
- * 📊 Endpoint: آمار میانگین/حداقل/حداکثر برای دستگاه خاص
- * GET /api/analytics/device/:deviceId?from=2025-10-20&to=2025-10-21
+ * 📊 دریافت آمار تحلیلی
  */
 router.get(
   "/analytics/device/:deviceId",
   async (
-    req: Request<{ deviceId: string }, unknown, unknown, { from?: string; to?: string }>,
+    req: Request<{ deviceId: string }, any, any, { from?: string; to?: string }>,
     res: Response
   ) => {
     const { deviceId } = req.params;
@@ -41,16 +37,19 @@ router.get(
         return res.json({ deviceId, count: 0, avg: null, min: null, max: null });
       }
 
-      // استخراج دماها از payload
+      // 👇 تبدیل type ایمن‌تر
       const temperatures = data
-        .map((d: { payload: TelemetryPayload; }) => (d.payload as TelemetryPayload).temperature)
+        .map((d: { payload: unknown; }) => {
+          const payload = d.payload as unknown as TelemetryPayload;
+          return typeof payload.temperature === "number" ? payload.temperature : undefined;
+        })
         .filter((t: any): t is number => typeof t === "number");
 
       const avg = temperatures.reduce((a: any, b: any) => a + b, 0) / temperatures.length;
       const min = Math.min(...temperatures);
       const max = Math.max(...temperatures);
 
-      return res.json({
+      res.json({
         deviceId,
         count: temperatures.length,
         avg: Number(avg.toFixed(2)),
@@ -61,19 +60,18 @@ router.get(
       });
     } catch (err) {
       console.error("Analytics error:", err);
-      return res.status(500).json({ error: "Failed to compute analytics" });
+      res.status(500).json({ error: "Failed to compute analytics" });
     }
   }
 );
 
 /**
- * 📈 Endpoint: داده‌های تایم‌سری برای ترند
- * GET /api/analytics/trend/:deviceId?from=2025-10-20&to=2025-10-21
+ * 📈 داده‌های ترند (برای نمودار)
  */
 router.get(
   "/analytics/trend/:deviceId",
   async (
-    req: Request<{ deviceId: string }, unknown, unknown, { from?: string; to?: string }>,
+    req: Request<{ deviceId: string }, any, any, { from?: string; to?: string }>,
     res: Response
   ) => {
     const { deviceId } = req.params;
@@ -89,19 +87,22 @@ router.get(
         select: { time: true, payload: true },
       });
 
-      const trend = data.map((d: { payload: TelemetryPayload; time: any; }) => {
-        const payload = d.payload as TelemetryPayload;
+      // 👇 اینجا هم cast ایمن‌تر
+      const trend = data.map((d: { payload: unknown; time: any; }) => {
+        const payload = d.payload as unknown as TelemetryPayload;
         return {
           time: d.time,
-          temperature: payload.temperature ?? null,
-          humidity: payload.humidity ?? null,
+          temperature:
+            typeof payload.temperature === "number" ? payload.temperature : null,
+          humidity:
+            typeof payload.humidity === "number" ? payload.humidity : null,
         };
       });
 
-      return res.json({ deviceId, trend });
+      res.json({ deviceId, trend });
     } catch (err) {
       console.error("Trend error:", err);
-      return res.status(500).json({ error: "Failed to fetch trend" });
+      res.status(500).json({ error: "Failed to fetch trend" });
     }
   }
 );

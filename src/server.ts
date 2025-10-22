@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import healthRoute from "./api/health.js";
 import metricsRoute from "./api/metrics.js";
 import queryRoute from "./api/query.js";
-import "./mqtt/index.ts";
+import "./mqtt/index.js";
 import analyticsRoute from "./api/analytics.js";
 
 

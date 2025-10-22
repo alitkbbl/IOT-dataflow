@@ -1,6 +1,6 @@
 import mqtt from "mqtt";
 import dotenv from "dotenv";
-import { handleIncomingMessage } from "./handler.ts";
+import { handleIncomingMessage } from "./handler.js";
 
 dotenv.config();
 
