@@ -1,5 +1,5 @@
 /**
- * نقطه شروع برنامه IOT-DATAFLOW
+ * IOT-DATAFLOW
  * Express server + API routes
  */
 import express from "express";
@@ -17,14 +17,14 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// مسیرهای API
+// API
 app.use("/api", healthRoute);
 app.use("/api", metricsRoute);
 app.use("/api", queryRoute);
 app.use("/api", analyticsRoute);
 
 
-// راه‌اندازی سرور
+// Run server
 const PORT = Number(process.env.PORT ?? 3000);
 app.listen(PORT, () => {
   console.log(`🚀 IOT-DATAFLOW API running on port ${PORT}`);

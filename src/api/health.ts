@@ -1,5 +1,5 @@
 /**
- * بررسی سلامت سیستم و پایگاه داده
+ * System health
  */
 import express, { Request, Response } from "express";
 import { checkDBHealth } from "../db/repository.js";

@@ -1,5 +1,5 @@
 /**
- * Endpoint کوئری داده‌ها از TimescaleDB
+ * Endpoint get data TimescaleDB
  */
 import express, { Request, Response } from "express";
 import { getTelemetry } from "../db/repository.js";

@@ -1,4 +1,4 @@
-# --- مرحله build ---
+# --- build ---
 FROM node:22-alpine AS builder
 WORKDIR /app
 
@@ -10,9 +10,9 @@ COPY prisma ./prisma
 COPY src ./src
 
 RUN npx prisma generate
-RUN npm run build  # خروجی در dist ✅
+RUN npm run build  
 
-# --- مرحله اجرا (runtime) ---
+# --- (runtime) ---
 FROM node:22-alpine
 WORKDIR /app
 
@@ -23,7 +23,6 @@ COPY --from=builder /app/dist ./dist
 COPY prisma ./prisma
 COPY .env .env
 
-# 👇 این خط را اضافه کن
 RUN npx prisma generate
 
 EXPOSE 3000
