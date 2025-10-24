@@ -25,8 +25,8 @@ Complete IoT data pipeline from virtual devices to TimescaleDB with MQTT and HTT
                                         │  (PostgreSQL)   │
                                         └─────────────────┘
 ```
+### 📦 Core Components
 
-Sure, here's the table in Markdown format that you can include in your README.md file:
 | Component | Technology | Purpose |
 | --- | --- | --- |
 | MQTT Broker | EMQX 5.x | Real-time message broker |
