@@ -1,34 +1,101 @@
 import mqtt from "mqtt";
-import dotenv from "dotenv";
+import { PrismaClient, Telemetry } from "@prisma/client";
 
-dotenv.config();
+const prisma = new PrismaClient();
 
-const brokerUrl = process.env.MQTT_BROKER_URL || "mqtt://localhost:1883";
-const client = mqtt.connect(brokerUrl);
+// تنظیمات MQTT
+const brokerUrl: string = process.env.MQTT_BROKER_URL || "mqtt://emqx:1883";
+const topicBase: string = process.env.MQTT_TOPIC_BASE || "iot/data";
+const client = mqtt.connect(brokerUrl, {
+  username: process.env.MQTT_USERNAME || "admin",
+  password: process.env.MQTT_PASSWORD || "public",
+});
 
-const DEVICE_COUNT = 3;
-const INTERVAL_MS = 2000;
+// سنسورهای شبیه‌سازی شده
+const sensors: string[] = ["sensor-1", "sensor-2", "sensor-3"];
+
+// داده اولیه هر سنسور
+interface SensorState {
+  temperature: number;
+  humidity: number;
+}
+
+const sensorData: Record<string, SensorState> = {};
+sensors.forEach((s) => {
+  sensorData[s] = { temperature: 25, humidity: 50 };
+});
+
+// بازه انتشار (ms)
+const interval: number = parseInt(process.env.PUBLISH_INTERVAL_MS || "5000", 10);
 
 client.on("connect", () => {
-  console.log("🚀 Virtual IoT Client connected to MQTT broker");
-
-  setInterval(() => {
-    for (let i = 1; i <= DEVICE_COUNT; i++) {
-      const payload = {
-        deviceId: `sensor-${i}`,
-        time: new Date().toISOString(),
-        payload: {
-          temperature: (20 + Math.random() * 5).toFixed(2),
-          humidity: (40 + Math.random() * 10).toFixed(2),
-        },
-      };
-
-      client.publish("iot/data/sensors", JSON.stringify(payload));
-      console.log(`📤 Sent data from ${payload.deviceId}`);
-    }
-  }, INTERVAL_MS);
+  console.log("✅ Connected to MQTT broker:", brokerUrl);
+  setInterval(publishAllSensors, interval);
 });
 
 client.on("error", (err) => {
-  console.error("❌ Virtual client error:", err);
+  console.error("❌ MQTT Error:", err);
 });
+
+// تابع برای تولید داده با تغییرات طبیعی
+function getRandomDelta(maxDelta: number): number {
+  return (Math.random() - 0.5) * 2 * maxDelta;
+}
+
+interface Payload {
+  deviceId: string;
+  timestamp: string;
+  temperature: number;
+  humidity: number;
+}
+
+function generatePayload(sensorId: string): Payload {
+  const data = sensorData[sensorId];
+
+  data.temperature = +(data.temperature + getRandomDelta(0.5)).toFixed(2);
+  data.humidity = +(data.humidity + getRandomDelta(1)).toFixed(2);
+
+  // جهش نادر
+  if (Math.random() < 0.05) data.temperature += 5;
+
+  return {
+    deviceId: sensorId,
+    timestamp: new Date().toISOString(),
+    temperature: data.temperature,
+    humidity: data.humidity,
+  };
+}
+
+// ارسال و ذخیره داده هر سنسور
+async function publishAndSave(sensorId: string) {
+  const payload = generatePayload(sensorId);
+  const topic = `${topicBase}/${sensorId}`;
+
+  // ارسال به MQTT
+  client.publish(topic, JSON.stringify(payload), { qos: 0 }, (err) => {
+    if (err) console.error("❌ MQTT Publish failed:", err);
+    else console.log("📡 Sent:", payload);
+  });
+
+  // ذخیره در PostgreSQL با Prisma
+  try {
+    await prisma.telemetry.create({
+      data: {
+        deviceId: sensorId,
+        topic: topic,
+        payload: JSON.parse(JSON.stringify(payload)),
+        metadata: { source: "simulator" },
+      },
+    });
+    console.log("💾 Saved to DB");
+  } catch (err) {
+    console.error("❌ DB save failed:", err);
+  }
+}
+
+// ارسال همه سنسورها در هر بازه زمانی
+function publishAllSensors() {
+  sensors.forEach((sensor) => {
+    publishAndSave(sensor);
+  });
+}

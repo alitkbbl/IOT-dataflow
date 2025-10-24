@@ -34,4 +34,13 @@ client.on("error", (err) => {
   console.error("MQTT Client Error:", err);
 });
 
+
+// 🧠 Start internal simulator if enabled
+if (process.env.SIMULATOR === "true") {
+  import("./simulator.js")
+    .then(() => console.log("🚀 Internal simulator started"))
+    .catch((err) => console.error("Failed to start simulator:", err));
+}
+
+
 export default client;

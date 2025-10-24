@@ -49,6 +49,9 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@timescaledb:5432/iot_dataflow?schema=public
       MQTT_BROKER_URL: mqtt://emqx:1883
       MQTT_TOPIC: iot/data/#
+      MQTT_USERNAME: admin
+      MQTT_PASSWORD: public
+      SIMULATOR: "true"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
       interval: 10s
