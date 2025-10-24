@@ -61,12 +61,12 @@ docker-compose ps
 ```
 ## 🧪 Testing All APIs
 🔍 Health Check
-bash
+```bash
 
 curl http://localhost:3000/api/health
-
+```
 Response:
-json
+```json
 
 {
   "status": "ok",
@@ -74,25 +74,28 @@ json
   "uptime": "45.2s",
   "timestamp": "2024-01-15T10:30:00.000Z"
 }
+```
 
 📊 Metrics (Prometheus)
-bash
+```bash
 
 curl http://localhost:3000/api/metrics
+```
 
 🔎 Query Telemetry Data
-bash
+```bash
 
 curl "http://localhost:3000/api/query?device_id=sensor-1&from=2024-01-15T00:00:00Z&to=2024-01-15T23:59:59Z&limit=10"
+```
 
 📈 Analytics APIs
 Device Statistics
-bash
+```bash
 
 curl "http://localhost:3000/api/analytics/device/sensor-1?from=2024-01-15T00:00:00Z&to=2024-01-15T23:59:59Z"
-
+```
 Response:
-json
+```json
 
 {
   "deviceId": "sensor-1",
@@ -103,17 +106,27 @@ json
   "from": "2024-01-15T00:00:00.000Z",
   "to": "2024-01-15T23:59:59.000Z"
 }
+```
 
-Trend Data
-bash
+📈 Trend Data
+```bash
 
 curl "http://localhost:3000/api/analytics/trend/sensor-1?from=2024-01-15T10:00:00Z&to=2024-01-15T11:00:00Z"
+```
 
 Aggregated Data (5-minute intervals)
-bash
+```bash
 
 curl "http://localhost:3000/api/analytics/aggregate/sensor-1?interval=5&from=2024-01-15T10:00:00Z&to=2024-01-15T11:00:00Z"
+```
 
+
+🔄 Reset Everything
+```bash
+
+docker-compose down -v
+docker-compose up -d
+```
 
 
 
