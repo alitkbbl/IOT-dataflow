@@ -2,40 +2,40 @@ services:
   timescaledb:
     image: timescale/timescaledb-ha:pg16
     container_name: timescaledb
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: iot_dataflow
-    volumes:
-      - timescale_data:/home/postgres/pgdata/data
     ports:
       - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
-      timeout: 3s
-      retries: 5
-    networks:
-      - iot-network
+      timeout: 5s
+      retries: 10
 
   emqx:
     image: emqx:5.8.6
     container_name: emqx
+    restart: always
+    environment:
+      - EMQX_DASHBOARD__DEFAULT_USERNAME=admin
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=public
     ports:
       - "1883:1883"
       - "8083:8083"
       - "18083:18083"
-    networks:
-      - iot-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:18083"]
+      test: ["CMD", "emqx_ctl", "status"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   iot-api:
     build: .
     container_name: iot-api
+    restart: always
     depends_on:
       timescaledb:
         condition: service_healthy
@@ -43,13 +43,14 @@ services:
         condition: service_healthy
     ports:
       - "3000:3000"
-    env_file: .env
-    networks:
-      - iot-network
-    restart: on-failure
-
-volumes:
-  timescale_data:
-
-networks:
-  iot-network:
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:postgres@timescaledb:5432/iot_dataflow?schema=public
+      MQTT_BROKER_URL: mqtt://emqx:1883
+      MQTT_TOPIC: iot/data/#
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
