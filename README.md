@@ -36,7 +36,7 @@ Complete IoT data pipeline from virtual devices to TimescaleDB with MQTT and HTT
 | Simulator | Custom Node.js | Virtual IoT devices |
 
 
-#### 🚀 Quick Start
+### 🚀 Quick Start
 
 Prerequisites
 
@@ -59,6 +59,60 @@ docker-compose up -d
 # Check services are healthy
 docker-compose ps
 ```
+## 🧪 Testing All APIs
+🔍 Health Check
+bash
+
+curl http://localhost:3000/api/health
+
+Response:
+json
+
+{
+  "status": "ok",
+  "database": "connected",
+  "uptime": "45.2s",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+
+📊 Metrics (Prometheus)
+bash
+
+curl http://localhost:3000/api/metrics
+
+🔎 Query Telemetry Data
+bash
+
+curl "http://localhost:3000/api/query?device_id=sensor-1&from=2024-01-15T00:00:00Z&to=2024-01-15T23:59:59Z&limit=10"
+
+📈 Analytics APIs
+Device Statistics
+bash
+
+curl "http://localhost:3000/api/analytics/device/sensor-1?from=2024-01-15T00:00:00Z&to=2024-01-15T23:59:59Z"
+
+Response:
+json
+
+{
+  "deviceId": "sensor-1",
+  "count": 150,
+  "avg": 24.5,
+  "min": 22.1,
+  "max": 26.8,
+  "from": "2024-01-15T00:00:00.000Z",
+  "to": "2024-01-15T23:59:59.000Z"
+}
+
+Trend Data
+bash
+
+curl "http://localhost:3000/api/analytics/trend/sensor-1?from=2024-01-15T10:00:00Z&to=2024-01-15T11:00:00Z"
+
+Aggregated Data (5-minute intervals)
+bash
+
+curl "http://localhost:3000/api/analytics/aggregate/sensor-1?interval=5&from=2024-01-15T10:00:00Z&to=2024-01-15T11:00:00Z"
 
 
 
