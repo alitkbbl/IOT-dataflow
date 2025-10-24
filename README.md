@@ -52,12 +52,20 @@ cd iot-dataflow
 ```
 2. Run with Docker
 ```bash
+# 🟢 Start services
+docker compose up --build -d
 
-# Start all services
-docker-compose up -d
+# 📊 Check status
+docker compose ps
+# or
+docker ps
 
-# Check services are healthy
-docker-compose ps
+# 🔍 View logs
+docker compose logs -f
+
+# 🔴 Stop services
+docker compose down -v
+
 ```
 ## 🧪 Testing All APIs
 🔍 Health Check
