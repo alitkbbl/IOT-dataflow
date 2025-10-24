@@ -1,31 +1,28 @@
 /**
- * 📦 handler.ts — مدیریت پیام‌های MQTT و ذخیره در TimescaleDB
+ * 📦 handler.ts - MQTT Messages Handler & TimescaleDB Storage
  */
 import { insertTelemetryBatch } from "../db/repository.js";
 
 /**
- * ✅ این تابع هر پیام دریافتی از MQTT را پردازش و در دیتابیس ذخیره می‌کند.
- * پشتیبانی از هر دو حالت:
- *  - پیام تکی: {"temperature":25.7,"humidity":43}
- *  - پیام با payload: {"payload": {"temperature":25.7,"humidity":43}}
+ * ✅ This function processes every MQTT message received and stores it in the database.
+ * Supports both formats:
+ *   - Single message: {"temperature":25.7,"humidity":43}
+ *  - Message with payload: {"payload": {"temperature":25.7,"humidity":43}}
  */
 export async function handleIncomingMessage(topic: string, rawMessage: string) {
   try {
     const data = JSON.parse(rawMessage);
 
-    // درصورتی که چند پیام باهم بیاد (آرایه)، همه را پردازش کن
     const messages = Array.isArray(data) ? data : [data];
 
     const rows = messages.map((msg) => ({
-      // اگر time داخل پیام بود، استفاده کن، وگرنه زمان فعلی
       time: msg.time ? new Date(msg.time) : new Date(),
 
-      // استخراج deviceId از پیام یا از مسیر topic
       deviceId: msg.deviceId || topic.split("/").pop() || "unknown",
 
       topic,
 
-      // ✅ اگر msg.payload وجود نداشت، خود msg را به عنوان payload ذخیره کن
+      // ✅ If msg.payload doesn't exist, save msg itself as the payload
       payload: msg.payload ? msg.payload : msg,
 
       seq: msg.seq || null,

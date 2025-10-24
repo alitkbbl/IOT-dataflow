@@ -3,7 +3,7 @@ import { PrismaClient, Telemetry } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// تنظیمات MQTT
+// setting MQTT
 const brokerUrl: string = process.env.MQTT_BROKER_URL || "mqtt://emqx:1883";
 const topicBase: string = process.env.MQTT_TOPIC_BASE || "iot/data";
 const client = mqtt.connect(brokerUrl, {
@@ -11,10 +11,9 @@ const client = mqtt.connect(brokerUrl, {
   password: process.env.MQTT_PASSWORD || "public",
 });
 
-// سنسورهای شبیه‌سازی شده
 const sensors: string[] = ["sensor-1", "sensor-2", "sensor-3"];
 
-// داده اولیه هر سنسور
+
 interface SensorState {
   temperature: number;
   humidity: number;
@@ -25,7 +24,7 @@ sensors.forEach((s) => {
   sensorData[s] = { temperature: 25, humidity: 50 };
 });
 
-// بازه انتشار (ms)
+// (ms)
 const interval: number = parseInt(process.env.PUBLISH_INTERVAL_MS || "5000", 10);
 
 client.on("connect", () => {
@@ -37,7 +36,7 @@ client.on("error", (err) => {
   console.error("❌ MQTT Error:", err);
 });
 
-// تابع برای تولید داده با تغییرات طبیعی
+// generate func
 function getRandomDelta(maxDelta: number): number {
   return (Math.random() - 0.5) * 2 * maxDelta;
 }
@@ -55,7 +54,6 @@ function generatePayload(sensorId: string): Payload {
   data.temperature = +(data.temperature + getRandomDelta(0.5)).toFixed(2);
   data.humidity = +(data.humidity + getRandomDelta(1)).toFixed(2);
 
-  // جهش نادر
   if (Math.random() < 0.05) data.temperature += 5;
 
   return {
@@ -66,18 +64,17 @@ function generatePayload(sensorId: string): Payload {
   };
 }
 
-// ارسال و ذخیره داده هر سنسور
 async function publishAndSave(sensorId: string) {
   const payload = generatePayload(sensorId);
   const topic = `${topicBase}/${sensorId}`;
 
-  // ارسال به MQTT
+  // MQTT send
   client.publish(topic, JSON.stringify(payload), { qos: 0 }, (err) => {
     if (err) console.error("❌ MQTT Publish failed:", err);
     else console.log("📡 Sent:", payload);
   });
 
-  // ذخیره در PostgreSQL با Prisma
+  // save
   try {
     await prisma.telemetry.create({
       data: {
@@ -93,7 +90,6 @@ async function publishAndSave(sensorId: string) {
   }
 }
 
-// ارسال همه سنسورها در هر بازه زمانی
 function publishAllSensors() {
   sensors.forEach((sensor) => {
     publishAndSave(sensor);
