@@ -47,8 +47,8 @@ Prerequisites
 1. Clone & Setup
 ```bash
 
-git clone <repository-url>
-cd iot-dataflow
+git clone https://github.com/alitkbbl/IOT-dataflow.git
+cd IOT-dataflow
 ```
 2. Run with Docker
 ```bash
@@ -67,8 +67,18 @@ docker compose logs -f
 docker compose down -v
 
 ```
-## 🧪 Testing All APIs
-🔍 Health Check
+### 📡 Test Data Ingestion
+
+#### MQTT Data (using mosquitto_pub)
+
+```bash
+mosquitto_pub -h localhost -p 1883 -t "iot/data/device-001" -m '{"temperature":24.7,"humidity":42}'
+```
+
+### 🧪 Testing All APIs
+
+####🔍 Health Check
+
 ```bash
 
 curl http://localhost:3000/api/health
@@ -84,19 +94,22 @@ Response:
 }
 ```
 
-📊 Metrics (Prometheus)
+####📊 Metrics (Prometheus)
+
 ```bash
 
 curl http://localhost:3000/api/metrics
 ```
 
-🔎 Query Telemetry Data
+####🔎 Query Telemetry Data
+
 ```bash
 
 curl "http://localhost:3000/api/query?device_id=sensor-1&from=2024-01-15T00:00:00Z&to=2024-01-15T23:59:59Z&limit=10"
 ```
 
-📈 Analytics APIs
+####📈 Analytics APIs
+
 Device Statistics
 ```bash
 
@@ -116,32 +129,25 @@ Response:
 }
 ```
 
-📈 Trend Data
+####📈 Trend Data
+
 ```bash
 
 curl "http://localhost:3000/api/analytics/trend/sensor-1?from=2024-01-15T10:00:00Z&to=2024-01-15T11:00:00Z"
 ```
 
-Aggregated Data (5-minute intervals)
+####📊 Aggregated Data (5-minute intervals)
+
 ```bash
 
 curl "http://localhost:3000/api/analytics/aggregate/sensor-1?interval=5&from=2024-01-15T10:00:00Z&to=2024-01-15T11:00:00Z"
 ```
 
 
-🔄 Reset Everything
+###🔄 Reset Everything
+
 ```bash
 
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
-
-
-
-
-
-
-
-
-
-
