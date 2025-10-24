@@ -77,7 +77,7 @@ mosquitto_pub -h localhost -p 1883 -t "iot/data/device-001" -m '{"temperature":2
 
 ### 🧪 Testing All APIs
 
-####🔍 Health Check
+#### 🔍 Health Check
 
 ```bash
 
@@ -94,21 +94,21 @@ Response:
 }
 ```
 
-####📊 Metrics (Prometheus)
+#### 📊 Metrics (Prometheus)
 
 ```bash
 
 curl http://localhost:3000/api/metrics
 ```
 
-####🔎 Query Telemetry Data
+#### 🔎 Query Telemetry Data
 
 ```bash
 
 curl "http://localhost:3000/api/query?device_id=sensor-1&from=2024-01-15T00:00:00Z&to=2024-01-15T23:59:59Z&limit=10"
 ```
 
-####📈 Analytics APIs
+#### 📈 Analytics APIs
 
 Device Statistics
 ```bash
@@ -129,14 +129,14 @@ Response:
 }
 ```
 
-####📈 Trend Data
+#### 📈 Trend Data
 
 ```bash
 
 curl "http://localhost:3000/api/analytics/trend/sensor-1?from=2024-01-15T10:00:00Z&to=2024-01-15T11:00:00Z"
 ```
 
-####📊 Aggregated Data (5-minute intervals)
+#### 📊 Aggregated Data (5-minute intervals)
 
 ```bash
 
@@ -144,7 +144,7 @@ curl "http://localhost:3000/api/analytics/aggregate/sensor-1?interval=5&from=202
 ```
 
 
-###🔄 Reset Everything
+### 🔄 Reset Everything
 
 ```bash
 
