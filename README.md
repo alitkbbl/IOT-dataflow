@@ -14,8 +14,8 @@ Complete IoT data pipeline from virtual devices to TimescaleDB with MQTT and HTT
                                          Subscribe
                                               │
                                               ↓ MQTT
-┌─────────────────┐    HTTP REST     ┌─────────────────┐
-│   Client        │ ←─────────────── │   Node.js API   │
+┌─────────────────┐    HTTP REST    ┌─────────────────┐
+│   Client        │ ←───────────────│   Node.js API   │
 │  Applications   │                 │   (Express)     │
 └─────────────────┘                 └─────────┬───────┘
                                               │
