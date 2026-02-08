@@ -1,7 +1,5 @@
 # 🌐 IoT Data Flow
 
-
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18.x-green.svg)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://www.docker.com/)
